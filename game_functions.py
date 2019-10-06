@@ -5,6 +5,7 @@ import pygame
 from bullet import Bullet
 from alien import Alien1, Alien2, Alien3
 
+clock = pygame.time.Clock()
 
 def check_keydown_events(event, ai_settings, screen, ship, bullets):
     """Respond to key presses"""
@@ -256,3 +257,4 @@ def check_high_score(stats, sb):
     if stats.score > stats.high_score:
         stats.high_score = stats.score
         sb.prep_high_score()
+

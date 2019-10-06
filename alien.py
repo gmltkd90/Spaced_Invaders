@@ -63,4 +63,4 @@ class Alien3(Alien):
         super().__init__(ai_settings, screen)
         self.image = pygame.image.load('image/alien11.png')
 
-        self.ai_settings.alien1_points = 30
+        self.ai_settings.alien1_points = 200
