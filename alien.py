@@ -1,6 +1,9 @@
 import pygame
 from pygame.sprite import Sprite
 
+def load_image(name):
+    image = pygame.image.load(name)
+    return image
 
 class Alien(Sprite):
     """A class to represent a single alien in the fleet."""
@@ -24,6 +27,8 @@ class Alien(Sprite):
 
         self.alien_points = 50
 
+        self.row_number = 0
+
     def blitme(self):
         """Draw the alien at its current location."""
         self.screen.blit(self.image, self.rect)
@@ -40,6 +45,8 @@ class Alien(Sprite):
         """Move the alien right or left."""
         self.x += (self.ai_settings.alien_speed_factor * self.ai_settings.fleet_direction)
         self.rect.x = self.x
+
+
 
 
 class Alien1(Alien):
@@ -63,4 +70,4 @@ class Alien3(Alien):
         super().__init__(ai_settings, screen)
         self.image = pygame.image.load('image/alien11.png')
 
-        self.ai_settings.alien1_points = 200
+        self.ai_settings.alien1_points = 30

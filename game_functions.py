@@ -2,10 +2,17 @@ import sys
 from time import sleep
 
 import pygame
-from bullet import Bullet
+from bullet import Bullet, Enemy_Bullet
 from alien import Alien1, Alien2, Alien3
 
 clock = pygame.time.Clock()
+
+pygame.mixer.init()
+bullet_sound = pygame.mixer.Sound('sound/bullet.wav')
+background_sound = pygame.mixer.Sound('sound/background.wav')
+eline_expl_sound = pygame.mixer.Sound('sound/expo.wav')
+
+
 
 def check_keydown_events(event, ai_settings, screen, ship, bullets):
     """Respond to key presses"""
@@ -23,6 +30,7 @@ def fire_bullet(ai_settings, screen, ship, bullets):
     """Fire a bullet if limit not reached yet."""
     # Create a new bullet and add it to the bullets group.
     if len(bullets) < ai_settings.bullets_allowed:
+        pygame.mixer.Channel(1).queue(bullet_sound)
         new_bullet = Bullet(ai_settings, screen, ship)
         bullets.add(new_bullet)
 
@@ -50,8 +58,10 @@ def check_events(ai_settings, screen, stats, sb, play_button, ship, aliens, bull
 def check_play_button(ai_settings, screen, stats, sb, play_button, ship, aliens, bullets, mouse_x, mouse_y):
     """Start a new game when the player clicks Play."""
     button_clicked = play_button.rect.collidepoint(mouse_x, mouse_y)
+
     if button_clicked and not stats.game_active:
         # Reset the game settings.
+        background_sound.play(-1)
         ai_settings.initialize_dynamic_settings()
 
         # Hide the mouse cursor.
@@ -99,6 +109,7 @@ def update_screen(ai_settings, screen, stats, sb, ship, aliens, bullets, play_bu
     pygame.display.flip()
 
 
+
 def update_bullets(ai_settings, screen, stats, sb, ship, aliens, bullets):
     """Update position of bullets and get rid of old bullets."""
     # Update bullet positions.
@@ -119,6 +130,8 @@ def check_bullet_alien_collisions(ai_settings, screen, stats, sb, ship, aliens, 
 
     if collisions:
         for aliens in collisions.values():
+            pygame.mixer.Channel(2).queue(eline_expl_sound)
+            #alien_expl(screen, bullets)
             stats.score += ai_settings.alien1_points # * len(aliens)
             sb.prep_score()
         check_high_score(stats, sb)
@@ -134,6 +147,11 @@ def check_bullet_alien_collisions(ai_settings, screen, stats, sb, ship, aliens, 
 
         create_fleet(ai_settings, screen, ship, aliens)
 
+
+def alien_expl(screen, bullets):
+    image = pygame.image.load('image/expo1.png')
+    rect = image.get_rect()
+    screen.blit(image, (bullets.rect().x))
 
 def get_number_aliens_x(ai_settings, alien_width):
     """Determine the number of aliens that fit in a row."""
@@ -157,20 +175,23 @@ def create_alien(ai_settings, screen, aliens, alien_number, row_number):
         alien.x = alien_width + 2 * alien_width * alien_number
         alien.rect.x = alien.x
         alien.rect.y = 50 + alien.rect.height + 2 * alien.rect.height * row_number
+        alien.row_number = row_number
         aliens.add(alien)
-    elif row_number < 4:
+    if row_number >=2 and row_number< 4:
         alien = Alien2(ai_settings, screen)
         alien_width = alien.rect.width
         alien.x = alien_width + 2 * alien_width * alien_number
         alien.rect.x = alien.x
         alien.rect.y = 50 + alien.rect.height + 2 * alien.rect.height * row_number
+        alien.row_number = row_number
         aliens.add(alien)
-    else:
+    if row_number >= 4:
         alien = Alien3(ai_settings, screen)
         alien_width = alien.rect.width
         alien.x = alien_width + 2 * alien_width * alien_number
         alien.rect.x = alien.x
         alien.rect.y = 50 + alien.rect.height + 2 * alien.rect.height * row_number
+        alien.row_number = row_number
         aliens.add(alien)
 
 
@@ -226,6 +247,7 @@ def ship_hit(ai_settings, screen, stats, sb, ship, aliens, bullets):
 
     else:
         stats.game_active = False
+        background_sound.stop()
         pygame.mouse.set_visible(True)
 
 
@@ -257,4 +279,13 @@ def check_high_score(stats, sb):
     if stats.score > stats.high_score:
         stats.high_score = stats.score
         sb.prep_high_score()
+
+
+WHITE = (255,255,255)
+def draw_text(text, font, screen, x, y):
+    textobj = font.render(text, 1, WHITE)
+    textrect = textobj.get_rect()
+    textrect.topleft = (x, y)
+    screen.blit(textobj, textrect)
+
 

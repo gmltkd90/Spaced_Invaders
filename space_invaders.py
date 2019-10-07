@@ -10,12 +10,17 @@ from ship import Ship
 import game_functions as gf
 
 
+
+
 def run_game():
     # initialize game and create a screen object.
     pygame.init()
     ai_settings = Settings()
     screen = pygame.display.set_mode((ai_settings.screen_width, ai_settings.screen_height))
-    pygame.display.set_caption("Spaced Invaders")
+    pygame.display.set_caption("Space Invaders")
+
+    font1 = pygame.font.Font(None, 20)
+    gf.draw_text('SPACE INVADERS', font1, screen, 200, 100)
 
     # Make the play button.
     play_button = Button(ai_settings, screen, "Play")
@@ -31,17 +36,17 @@ def run_game():
     aliens = Group()
 
     # Create the fleet of aliens.
-    gf.create_fleet(ai_settings, screen, ship, aliens)
+    # gf.create_fleet(ai_settings, screen, ship, aliens)
 
     # Start the main loop for the game
     while True:
         gf.check_events(ai_settings, screen, stats, sb, play_button, ship, aliens, bullets)
 
         if stats.game_active:
+            #gf.background_sound.play(-1)
             ship.update()
             gf.update_bullets(ai_settings, screen, stats, sb, ship, aliens, bullets)
             gf.update_aliens(ai_settings, screen, stats, sb, ship, aliens, bullets)
-
 
         gf.update_screen(ai_settings, screen, stats, sb, ship, aliens, bullets, play_button)
 
